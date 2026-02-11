@@ -1,0 +1,24 @@
+{
+  "name": "claw-bot-mstn",
+  "version": "1.0.0",
+  "description": "OpenClaw Skills - 머니스테이션 자동화",
+  "main": "dist/skills/moneystation/index.js",
+  "types": "dist/skills/moneystation/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "openclaw",
+    "moneystation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.58.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "typescript": "^5.9.3"
+  }
+}

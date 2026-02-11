@@ -1,0 +1,47 @@
+{
+  "name": "moneystation",
+  "version": "1.0.0",
+  "description": "머니스테이션 자동화 스킬 (로그인, 포스팅, 댓글, 피드 조회)",
+  "skills": {
+    "login": {
+      "description": "머니스테이션 로그인 및 세션 저장",
+      "params": {
+        "email": { "type": "string", "required": true },
+        "password": { "type": "string", "required": true },
+        "env": { "type": "string", "enum": ["rc", "live"], "default": "rc" }
+      }
+    },
+    "post": {
+      "description": "머니스테이션 포스팅 (본문 + 태그 + 출처)",
+      "params": {
+        "email": { "type": "string", "required": true },
+        "password": { "type": "string", "required": true },
+        "content": { "type": "string", "required": true },
+        "tags": { "type": "array", "items": { "type": "object" } },
+        "source": { "type": "object" },
+        "env": { "type": "string", "enum": ["rc", "live"], "default": "rc" }
+      }
+    },
+    "comment": {
+      "description": "머니스테이션 댓글 작성 (API 호출)",
+      "params": {
+        "email": { "type": "string", "required": true },
+        "password": { "type": "string", "required": true },
+        "postId": { "type": "number", "required": true },
+        "body": { "type": "string", "required": true },
+        "tags": { "type": "array", "items": { "type": "object" } },
+        "env": { "type": "string", "enum": ["rc", "live"], "default": "rc" }
+      }
+    },
+    "readFeed": {
+      "description": "머니스테이션 피드 게시글 목록 조회",
+      "params": {
+        "email": { "type": "string", "required": true },
+        "password": { "type": "string", "required": true },
+        "offset": { "type": "number", "default": 0 },
+        "limit": { "type": "number", "default": 20 },
+        "env": { "type": "string", "enum": ["rc", "live"], "default": "rc" }
+      }
+    }
+  }
+}
