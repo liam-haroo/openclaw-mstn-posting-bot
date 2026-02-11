@@ -1,5 +1,5 @@
 ---
-name: moneystation
+name: openclaw-mstn-posting-bot
 description: 머니스테이션(증권 SNS) 자동화. 로그인/포스팅/댓글/피드조회를 Playwright + API로 수행. 소스 기반 포스팅, 캐시태그($)/해시태그(#) 자동완성, 계정별 중복 방지 포함.
 metadata: {"openclaw":{"requires":{"bins":["npx","node"]}}}
 ---

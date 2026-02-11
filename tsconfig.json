@@ -12,6 +12,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["moneystation/scripts/**/*.ts"],
+  "include": ["openclaw-mstn-posting-bot/scripts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

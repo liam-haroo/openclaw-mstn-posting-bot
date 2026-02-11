@@ -1,10 +1,10 @@
 {
-  "name": "claw-bot-mstn",
+  "name": "openclaw-mstn-posting-bot",
   "version": "1.0.0",
   "description": "머니스테이션 자동화 스킬 (OpenClaw AgentSkills)",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "cli": "tsx moneystation/scripts/cli.ts"
+    "cli": "tsx openclaw-mstn-posting-bot/scripts/cli.ts"
   },
   "keywords": [
     "openclaw",
