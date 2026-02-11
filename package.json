@@ -1,11 +1,8 @@
 {
   "name": "claw-bot-mstn",
   "version": "1.0.0",
-  "description": "머니스테이션 자동화 스킬 (Claude Code Skills)",
-  "main": "dist/moneystation/scripts/index.js",
-  "types": "dist/moneystation/scripts/index.d.ts",
+  "description": "머니스테이션 자동화 스킬 (OpenClaw AgentSkills)",
   "scripts": {
-    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "cli": "tsx moneystation/scripts/cli.ts"
   },

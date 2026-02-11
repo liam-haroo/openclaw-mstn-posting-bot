@@ -1,6 +1,6 @@
 # 머니스테이션(MoneyStation) 자동화 스킬
 
-Claude Code Skills 형식으로 배포되는 머니스테이션 자동화 스킬 패키지.
+OpenClaw AgentSkills 형식으로 배포되는 머니스테이션 자동화 스킬 패키지.
 호출마다 다른 계정이 사용될 수 있다.
 
 > **머니스테이션**은 증권정보 SNS 플랫폼이다.
@@ -17,7 +17,7 @@ claw-bot-mstn/                              # 리포 루트 (개발 워크스페
 ├── tsconfig.json
 ├── .gitignore
 └── moneystation/                           # ← 배포되는 스킬 패키지
-    ├── SKILL.md                            # 스킬 진입점 (YAML frontmatter + Claude 지시서)
+    ├── SKILL.md                            # 스킬 진입점 (YAML frontmatter + 에이전트 지시서)
     ├── scripts/                            # 실행 코드 (Claude가 Bash로 실행)
     │   ├── cli.ts                          # CLI 엔트리포인트 (npx tsx)
     │   ├── index.ts                        # 모듈 re-export
@@ -62,22 +62,21 @@ claw-bot-mstn/                              # 리포 루트 (개발 워크스페
 
 ---
 
-## 빌드 / 실행
+## 개발 / 실행
 
 ```bash
-npm run typecheck   # tsc --noEmit
-npm run build       # tsc → dist/
+npm run typecheck   # tsc --noEmit (타입 체크)
 
-# CLI 직접 실행 (tsx)
+# CLI 직접 실행 (tsx — 빌드 없이 TypeScript 직접 실행)
 npx tsx moneystation/scripts/cli.ts login --email dev --password 1234 --env rc
 npx tsx moneystation/scripts/cli.ts post --email dev --password 1234 --content "..." --tags '[...]'
 npx tsx moneystation/scripts/cli.ts comment --email dev --password 1234 --post-id 123 --body "..."
 npx tsx moneystation/scripts/cli.ts read-feed --email dev --password 1234
 ```
 
-- `tsconfig.json`: target ES2022, module Node16, strict, declaration + sourceMap
+- `tsconfig.json`: target ES2022, module Node16, strict
 - include: `moneystation/scripts/**/*.ts`
-- 출력: `dist/moneystation/scripts/`
+- 별도 빌드 불필요 — `tsx`가 TypeScript를 직접 실행
 
 ### 의존성
 
