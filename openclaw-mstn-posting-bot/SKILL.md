@@ -1,6 +1,6 @@
 ---
 name: openclaw-mstn-posting-bot
-description: 머니스테이션(증권 SNS) 자동화. 로그인/포스팅/댓글/피드조회를 Playwright + API로 수행. 소스 기반 포스팅, 캐시태그($)/해시태그(#) 자동완성, 계정별 중복 방지 포함.
+description: 머니스테이션(증권 SNS) 자동화. 로그인/포스팅/댓글/피드조회를 Playwright + API로 수행. 소스 기반 포스팅, 캐시태그($)/해시태그(#) 자동완성, 계정별 중복 방지 포함. Use when: (1) moneystation.net or dev2.moneystation.kr URL이 언급될 때, (2) 머니스테이션 게시글 조회/포스팅/댓글 요청 시. URL에서 postId를 추출하여 API로 본문을 조회한다(JS 렌더링이라 웹스크래핑 불가).
 metadata: {"openclaw":{"requires":{"bins":["npx","node"]}}}
 ---
 
@@ -16,6 +16,19 @@ metadata: {"openclaw":{"requires":{"bins":["npx","node"]}}}
 - 스킬은 **실행**만 담당 (로그인, 포스팅, 댓글, 피드 조회)
 - 에이전트가 **판단**을 담당 (어떤 내용을 쓸지, 어떤 태그를 붙일지)
 - `--source` 필드는 콘텐츠를 대체하지 않고, 출처 표시용 메타데이터로만 사용
+
+**머니스테이션 URL 처리 (중요):**
+
+머니스테이션 웹페이지는 JS 렌더링이라 WebFetch/웹스크래핑으로 본문을 읽을 수 없다.
+머니스테이션 게시글 URL이 주어지면 반드시 아래 절차를 따른다:
+
+1. URL에서 postId를 추출한다: `https://www.moneystation.net/post/116590` → postId = `116590`
+2. `read-post --post-id <추출한 ID> --env live` 명령으로 API를 통해 본문을 조회한다
+3. **절대로** 머니스테이션 URL을 직접 fetch/웹스크래핑하지 않는다
+
+URL 패턴:
+- `https://www.moneystation.net/post/<postId>` → `--env live`
+- `https://dev2.moneystation.kr/post/<postId>` → `--env rc`
 
 **중복 방지 (계정별, 자동):**
 
@@ -198,6 +211,22 @@ npx tsx {baseDir}/scripts/cli.ts read-feed --email user@example.com --password p
 2. 에이전트가 게시글 내용을 읽고 맥락에 맞는 댓글 생성 (LLM)
 3. npx tsx {baseDir}/scripts/cli.ts comment --post-id <id> --body "..."
 ```
+
+### 댓글 작성 (URL 기반)
+
+사용자가 머니스테이션 게시글 URL을 제공한 경우:
+
+```
+사용자: "https://www.moneystation.net/post/116590 이 글에 댓글 달아줘"
+
+1. URL에서 postId 추출: 116590
+2. URL 도메인으로 env 판별: www.moneystation.net → live
+3. npx tsx {baseDir}/scripts/cli.ts read-post --post-id 116590 --env live → 게시글 상세 조회
+4. 에이전트가 게시글 내용을 읽고 맥락에 맞는 댓글 생성 (LLM)
+5. npx tsx {baseDir}/scripts/cli.ts comment --post-id 116590 --body "..." --env live
+```
+
+> **주의**: 머니스테이션 URL을 WebFetch/웹스크래핑으로 직접 읽으면 안 된다. 반드시 `read-post` API를 사용한다.
 
 ## 에러 대응
 
