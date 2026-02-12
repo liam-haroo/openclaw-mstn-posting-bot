@@ -4,7 +4,7 @@
   "description": "머니스테이션 자동화 스킬 (OpenClaw AgentSkills)",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "cli": "tsx openclaw-mstn-posting-bot/scripts/cli.ts"
+    "cli": "tsx scripts/cli.ts"
   },
   "keywords": [
     "openclaw",

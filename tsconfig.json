@@ -12,6 +12,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["openclaw-mstn-posting-bot/scripts/**/*.ts"],
+  "include": ["scripts/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

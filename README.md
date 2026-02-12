@@ -3,6 +3,29 @@
 머니스테이션(증권 SNS) 자동화 OpenClaw 스킬.
 로그인, 포스팅, 댓글, 피드 조회를 에이전트가 CLI로 실행합니다.
 
+## 스킬 구조
+
+이 리포는 **OpenClaw 스킬 패키지이자 개발 워크스페이스**입니다.
+`~/.openclaw/skills/openclaw-mstn-posting-bot/`에 clone하면 바로 스킬로 인식됩니다.
+
+```
+openclaw-mstn-posting-bot/
+├── SKILL.md              ← 스킬 진입점 (OpenClaw이 인식)
+├── scripts/              ← 실행 코드 (에이전트가 Bash로 실행)
+│   ├── cli.ts
+│   ├── login.ts, post.ts, comment.ts, feed.ts
+│   └── lib/
+├── references/           ← 상세 문서 (에이전트가 필요 시 참조)
+│   └── site-analysis.md
+├── PLAN.md               ← 설계 문서 (개발용)
+├── README.md             ← 이 파일 (개발용)
+├── package.json          ← 의존성 (개발용)
+└── tsconfig.json         ← TypeScript 설정 (개발용)
+```
+
+**스킬 파일**: `SKILL.md`, `scripts/`, `references/` — OpenClaw 에이전트가 사용
+**개발 파일**: `PLAN.md`, `README.md`, `package.json`, `tsconfig.json` — 개발/빌드용
+
 ## 설치
 
 ### 요구 사항
@@ -31,7 +54,7 @@ npm install && npx playwright install chromium
 ### login
 
 ```bash
-npx tsx openclaw-mstn-posting-bot/scripts/cli.ts login \
+npx tsx scripts/cli.ts login \
   --email user@example.com --password pass123
 ```
 
@@ -40,7 +63,7 @@ npx tsx openclaw-mstn-posting-bot/scripts/cli.ts login \
 ### post
 
 ```bash
-npx tsx openclaw-mstn-posting-bot/scripts/cli.ts post \
+npx tsx scripts/cli.ts post \
   --email user@example.com --password pass123 \
   --content "포스팅 본문" \
   --tags '[{"type":"cash","name":"삼성전자"},{"type":"topic","name":"반도체"}]' \
@@ -57,7 +80,7 @@ npx tsx openclaw-mstn-posting-bot/scripts/cli.ts post \
 ### comment
 
 ```bash
-npx tsx openclaw-mstn-posting-bot/scripts/cli.ts comment \
+npx tsx scripts/cli.ts comment \
   --email user@example.com --password pass123 \
   --post-id 57741 \
   --body "댓글 내용" \
@@ -67,7 +90,7 @@ npx tsx openclaw-mstn-posting-bot/scripts/cli.ts comment \
 ### read-post
 
 ```bash
-npx tsx openclaw-mstn-posting-bot/scripts/cli.ts read-post \
+npx tsx scripts/cli.ts read-post \
   --email user@example.com --password pass123 \
   --post-id 57741
 ```
@@ -77,7 +100,7 @@ npx tsx openclaw-mstn-posting-bot/scripts/cli.ts read-post \
 ### read-feed
 
 ```bash
-npx tsx openclaw-mstn-posting-bot/scripts/cli.ts read-feed \
+npx tsx scripts/cli.ts read-feed \
   --email user@example.com --password pass123 \
   --offset 0 --limit 20
 ```

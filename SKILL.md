@@ -1,6 +1,6 @@
 ---
 name: openclaw-mstn-posting-bot
-description: 머니스테이션(증권 SNS) 자동화. 로그인/포스팅/댓글/피드조회를 Playwright + API로 수행. 소스 기반 포스팅, 캐시태그($)/해시태그(#) 자동완성, 계정별 중복 방지 포함. Use when: (1) moneystation.net or dev2.moneystation.kr URL이 언급될 때, (2) 머니스테이션 게시글 조회/포스팅/댓글 요청 시. URL에서 postId를 추출하여 API로 본문을 조회한다(JS 렌더링이라 웹스크래핑 불가).
+description: "MUST use for any request containing moneystation.net or dev2.moneystation.kr URLs, or any mention of 머니스테이션/MoneyStation. 머니스테이션 증권 SNS 자동화: 게시글 조회(read-post), 포스팅, 댓글, 피드 조회. 머니스테이션은 JS렌더링 사이트라 WebFetch 불가 — 반드시 이 스킬의 read-post API로 본문을 조회해야 한다."
 metadata: {"openclaw":{"requires":{"bins":["npx","node"]}}}
 ---
 
@@ -232,6 +232,7 @@ npx tsx {baseDir}/scripts/cli.ts read-feed --email user@example.com --password p
 
 | 상황 | 자동 대응 |
 |------|----------|
+| MODULE_NOT_FOUND / Cannot find package | `cd {baseDir} && npm install && npx playwright install chromium` 실행 후 재시도 |
 | 세션 만료 | email/password로 자동 재로그인 |
 | 댓글 API 403 | 자동 재로그인 후 재시도 |
 | 포스팅/댓글 중복 | `success: false` 반환 (자동 차단) |
@@ -241,3 +242,4 @@ npx tsx {baseDir}/scripts/cli.ts read-feed --email user@example.com --password p
 ## Resources
 
 - [references/site-analysis.md](references/site-analysis.md) — API 엔드포인트, 셀렉터, JWT 구조, 데이터 구조, Playwright 구현 디테일
+
