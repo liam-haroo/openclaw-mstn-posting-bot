@@ -52,10 +52,23 @@ URL 패턴:
 | **RC** | `https://dev2.moneystation.kr` | `https://api-dev.moneystation.kr` | `--env rc` (기본) |
 | **Live** | `https://www.moneystation.net` | `https://api.moneystation.net` | `--env live` |
 
-## 인증 (필수)
+## 인증 (필수 — 최우선)
 
-모든 커맨드는 `--email`과 `--password`가 필요하다. 로그인 정보가 없으면 **사용자에게 먼저 물어본 뒤** 커맨드를 실행한다.
+모든 커맨드는 `--email`과 `--password`가 필요하다. `--email`에는 **이메일 또는 아이디(닉네임)** 둘 다 사용 가능하다.
+
+**비로그인 상태에서 요청이 들어오면, 무조건 첫 번째 응답에서 아이디(또는 이메일)와 비밀번호를 요청한다.**
+다른 선택지를 먼저 제시하지 않는다. 텍스트 붙여넣기 등의 대안은 사용자가 로그인을 거부한 후에만 안내한다.
+
+```
+[올바른 응답 예시]
+"머니스테이션 아이디(또는 이메일)와 비밀번호를 알려주세요. 로그인 후 게시글을 조회하고 댓글을 제안해 드리겠습니다."
+
+[잘못된 응답 예시 — 이렇게 하지 않는다]
+"아래 둘 중 하나로 진행할게요: 1) 텍스트 붙여넣기 2) 로그인 정보 제공"
+```
+
 이미 로그인한 세션이 있으면 자동 재사용되므로 매번 묻지 않아도 된다 (TTL: 3시간).
+사용자가 로그인을 거부하면 그때 "게시글 텍스트를 직접 붙여넣어 주시면 그 내용으로 댓글을 제안해 드릴 수 있습니다"라고 안내한다.
 
 ## Commands
 
@@ -63,7 +76,7 @@ URL 패턴:
 
 ### login
 
-머니스테이션에 이메일/비밀번호로 로그인하고 세션을 저장한다.
+머니스테이션에 이메일(또는 아이디)/비밀번호로 로그인하고 세션을 저장한다.
 동일 계정의 유효한 세션(3시간 TTL)이 있으면 재로그인을 생략한다.
 
 ```bash
@@ -92,7 +105,7 @@ npx tsx {baseDir}/scripts/cli.ts post \
 
 | 옵션 | 필수 | 설명 |
 |------|------|------|
-| `--email` | Y | 로그인 이메일 |
+| `--email` | Y | 이메일 또는 아이디 |
 | `--password` | Y | 비밀번호 |
 | `--content` | Y | 포스팅 본문 |
 | `--tags` | N | JSON 배열 `[{"type":"cash\|topic","name":"..."}]` |
@@ -116,7 +129,7 @@ npx tsx {baseDir}/scripts/cli.ts comment \
 
 | 옵션 | 필수 | 설명 |
 |------|------|------|
-| `--email` | Y | 로그인 이메일 |
+| `--email` | Y | 이메일 또는 아이디 |
 | `--password` | Y | 비밀번호 |
 | `--post-id` | Y | 댓글 대상 게시글 ID |
 | `--body` | Y | 댓글 본문 |
@@ -126,6 +139,7 @@ npx tsx {baseDir}/scripts/cli.ts comment \
 ### read-post
 
 특정 게시글의 상세 내용을 조회한다. 댓글 작성 전 대상 게시글의 맥락을 파악할 때 사용.
+**미디어 자동 추출**: 본문 HTML에서 이미지/링크/유튜브 URL을 파싱하여 `media` 필드로 반환한다.
 
 ```bash
 npx tsx {baseDir}/scripts/cli.ts read-post \
@@ -135,27 +149,38 @@ npx tsx {baseDir}/scripts/cli.ts read-post \
 
 | 옵션 | 필수 | 설명 |
 |------|------|------|
-| `--email` | Y | 로그인 이메일 |
+| `--email` | Y | 이메일 또는 아이디 |
 | `--password` | Y | 비밀번호 |
 | `--post-id` | Y | 조회할 게시글 ID |
 | `--env` | N | `rc` (기본) 또는 `live` |
 
-반환 JSON:
+반환 JSON (`media`는 해당 미디어가 있을 때만 포함):
 ```json
 {
   "success": true,
   "post": {
-    "postId": 57741,
-    "nickname": "dev__",
-    "content": "본문 텍스트...",
-    "cashTags": ["삼성전자"],
-    "topicTags": ["테스트"],
-    "likeCount": 0,
-    "commentCount": 1
+    "postId": 116590,
+    "nickname": "이십팔만전자포에버",
+    "content": "8만 원대 고생하며 버틴 보람이 있다...",
+    "cashTags": ["삼성전자", "삼성전자우", "KODEX삼성그룹"],
+    "topicTags": ["삼전", "신고가"],
+    "likeCount": 13,
+    "commentCount": 0,
+    "media": {
+      "images": ["https://storage.moneystation.kr/images/posts/...jpg"],
+      "links": [{"url": "https://www.etoday.co.kr/...", "title": "기사 제목", "description": "기사 설명", "imageUrl": "https://..."}],
+      "youtube": ["https://youtube.com/watch?v=..."]
+    }
   },
+  "rawFields": { "iSentimentStatus": 1, "sProfileImage": "...", "createdAt": "..." },
   "message": "게시글 조회 완료"
 }
 ```
+
+미디어 소스:
+- `media.images` ← API 필드 `sPostImage` (쉼표 구분 URL)
+- `media.links` ← API 필드 `objPostLink` (URL, 제목, 설명, 프리뷰 이미지)
+- `media.youtube` ← `objPostLink` 또는 `sPostContents` 내 유튜브 URL
 
 ### read-feed
 
@@ -242,10 +267,16 @@ npx tsx {baseDir}/scripts/cli.ts read-feed --email user@example.com --password p
 ### 댓글 작성 (특정 게시글)
 
 ```
-1. npx tsx {baseDir}/scripts/cli.ts read-post --post-id <id> → 게시글 상세 조회
-2. 에이전트가 게시글 내용을 읽고 맥락에 맞는 댓글 생성 (LLM)
+1. npx tsx {baseDir}/scripts/cli.ts read-post --post-id <id> → 게시글 상세 조회 (텍스트 + 미디어)
+2. 에이전트가 게시글 내용(텍스트, 이미지, 링크, 유튜브)을 종합적으로 파악하고 맥락에 맞는 댓글 생성 (LLM)
 3. npx tsx {baseDir}/scripts/cli.ts comment --post-id <id> --body "..."
 ```
+
+> **미디어 활용**: `read-post` 응답의 `media` 필드를 확인한다.
+> - `media.images`: 첨부 이미지가 있으면 이미지 내용을 언급하거나 관련 의견 추가
+> - `media.links`: 공유된 링크가 있으면 해당 기사/자료의 맥락을 반영
+> - `media.youtube`: 유튜브 영상이 있으면 영상 주제에 대한 의견 반영
+> - `rawFields`: API가 추가 필드를 반환하면 참고 (아직 발견되지 않은 미디어 관련 필드가 있을 수 있음)
 
 ### 댓글 작성 (URL 기반)
 
@@ -254,16 +285,16 @@ npx tsx {baseDir}/scripts/cli.ts read-feed --email user@example.com --password p
 ```
 사용자: "https://www.moneystation.net/post/116590 이 글에 댓글 달아줘"
 
-1. URL에서 postId 추출: 116590
-2. URL 도메인으로 env 판별: www.moneystation.net → live
-3. 로그인 정보(email/password)가 없으면 사용자에게 물어본다
-4. npx tsx {baseDir}/scripts/cli.ts read-post --post-id 116590 --email <email> --password <pw> --env live → 게시글 상세 조회
-5. 에이전트가 게시글 내용을 읽고 맥락에 맞는 댓글 생성 (LLM)
-6. npx tsx {baseDir}/scripts/cli.ts comment --post-id 116590 --email <email> --password <pw> --body "..." --env live
+1. [최우선] 로그인 정보 확보: 아이디(또는 이메일)와 비밀번호가 없으면 먼저 물어본다
+2. URL에서 postId 추출: 116590
+3. URL 도메인으로 env 판별: www.moneystation.net → live
+4. npx tsx {baseDir}/scripts/cli.ts read-post --post-id 116590 --email <id> --password <pw> --env live → 게시글 상세 + 미디어 조회
+5. 에이전트가 게시글 내용(텍스트 + 미디어)을 종합 파악하고 맥락에 맞는 댓글 생성 (LLM)
+6. npx tsx {baseDir}/scripts/cli.ts comment --post-id 116590 --email <id> --password <pw> --body "..." --env live
 ```
 
 > **주의**: 머니스테이션 URL을 WebFetch/웹스크래핑으로 직접 읽으면 안 된다. 반드시 `read-post` API를 사용한다.
-> **주의**: 로그인 정보 없이는 게시글 조회가 불가하다. 정보가 없으면 반드시 사용자에게 먼저 물어본다.
+> **주의**: 로그인 정보가 없으면 무조건 먼저 요청한다. 텍스트 붙여넣기 대안은 사용자가 로그인을 거부한 경우에만 안내한다.
 
 ## 에러 대응
 
